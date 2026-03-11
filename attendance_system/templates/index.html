@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Attendance Scanner | Attendance System</title>
+    <meta name="description"
+        content="RFID/Barcode based student attendance management system with live webcam scanning">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v='20260311-theme1') }}">
+</head>
+
+<body>
+    <!-- ─── Navigation ─── -->
+    <nav class="navbar" id="main-nav">
+        <div class="nav-brand">
+            <div class="nav-logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" />
+                    <line x1="7" y1="8" x2="17" y2="8" />
+                    <line x1="7" y1="12" x2="17" y2="12" />
+                    <line x1="7" y1="16" x2="12" y2="16" />
+                </svg>
+            </div>
+            <span>AttendTrack</span>
+        </div>
+        <div class="nav-links">
+            <a href="/" class="nav-link active" id="nav-scanner">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                    <path d="M3 7V5a2 2 0 0 1 2-2h2" />
+                    <path d="M17 3h2a2 2 0 0 1 2 2v2" />
+                    <path d="M21 17v2a2 2 0 0 1-2 2h-2" />
+                    <path d="M7 21H5a2 2 0 0 1-2-2v-2" />
+                    <line x1="7" y1="12" x2="17" y2="12" />
+                </svg>
+                Scanner
+            </a>
+            <a href="/dashboard" class="nav-link" id="nav-dashboard">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                    <rect x="3" y="3" width="7" height="7" rx="1" />
+                    <rect x="14" y="3" width="7" height="7" rx="1" />
+                    <rect x="3" y="14" width="7" height="7" rx="1" />
+                    <rect x="14" y="14" width="7" height="7" rx="1" />
+                </svg>
+                Dashboard
+            </a>
+            <a href="/barcodes" class="nav-link" id="nav-barcodes">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                    <rect x="2" y="4" width="20" height="16" rx="2" />
+                    <line x1="6" y1="8" x2="6" y2="16" />
+                    <line x1="10" y1="8" x2="10" y2="16" />
+                    <line x1="14" y1="8" x2="14" y2="16" />
+                    <line x1="18" y1="8" x2="18" y2="16" />
+                </svg>
+                Barcodes
+            </a>
+        </div>
+    </nav>
+
+    <!-- ─── Main Content ─── -->
+    <main class="main-content">
+        <!-- Stats Strip -->
+        <div class="stats-strip" id="stats-strip">
+            <div class="stat-pill">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
+                <span>Today: <strong id="stat-today">0</strong></span>
+            </div>
+            <div class="stat-pill">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                    <path d="M12 20h9" />
+                    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+                </svg>
+                <span>Total Students: <strong id="stat-total">0</strong></span>
+            </div>
+        </div>
+
+        <div class="scanner-layout">
+            <!-- ─── Scanner Section ─── -->
+            <section class="scanner-section" id="scanner-section">
+                <div class="section-header">
+                    <h1>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="28"
+                            height="28">
+                            <path d="M3 7V5a2 2 0 0 1 2-2h2" />
+                            <path d="M17 3h2a2 2 0 0 1 2 2v2" />
+                            <path d="M21 17v2a2 2 0 0 1-2 2h-2" />
+                            <path d="M7 21H5a2 2 0 0 1-2-2v-2" />
+                        </svg>
+                        Barcode / RFID Scanner
+                    </h1>
+                    <p class="section-subtitle">Point your barcode at the camera or enter a register number manually to load the student details.</p>
+                </div>
+
+                <!-- Scanner Container -->
+                <div class="scanner-container" id="scanner-container">
+                    <div id="reader" class="scanner-reader"></div>
+                    <div class="scanner-overlay">
+                        <div class="scan-region-highlight"></div>
+                    </div>
+                </div>
+
+                <!-- Scanner Controls -->
+                <div class="scanner-controls">
+                    <button class="btn btn-outline" id="btn-start-scanner" type="button">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18"
+                            height="18">
+                            <polygon points="5 3 19 12 5 21 5 3" />
+                        </svg>
+                        Start Camera
+                    </button>
+                    <button class="btn btn-outline btn-danger" id="btn-stop-scanner" type="button"
+                        style="display:none;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18"
+                            height="18">
+                            <rect x="6" y="6" width="12" height="12" rx="1" />
+                        </svg>
+                        Stop Camera
+                    </button>
+                </div>
+
+                <!-- Manual Input -->
+                <div class="manual-input-group">
+                    <div class="input-wrapper">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18"
+                            height="18" class="input-icon">
+                            <rect x="2" y="4" width="20" height="16" rx="2" />
+                            <line x1="6" y1="8" x2="6" y2="16" />
+                            <line x1="10" y1="8" x2="10" y2="16" />
+                            <line x1="14" y1="8" x2="14" y2="16" />
+                            <line x1="18" y1="8" x2="18" y2="16" />
+                        </svg>
+                        <input type="text" id="manual-reg-input"
+                            placeholder="Enter RegNo manually or scan barcode"
+                            autocomplete="off">
+                    </div>
+                    <button class="btn btn-primary" id="btn-manual-search" type="button" disabled>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18"
+                            height="18">
+                            <circle cx="11" cy="11" r="8" />
+                            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                        </svg>
+                        Find Student
+                    </button>
+                </div>
+            </section>
+
+            <!-- ─── Student Details Card ─── -->
+            <section class="student-card-section" id="student-card-section">
+                <!-- Empty State -->
+                <div class="empty-state" id="empty-state">
+                    <div class="empty-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="64"
+                            height="64">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                            <circle cx="12" cy="7" r="4" />
+                        </svg>
+                    </div>
+                    <h3>No Student Selected</h3>
+                    <p>Scan a barcode or search by register number to view student details</p>
+                </div>
+
+                <!-- Student Details (hidden by default) -->
+                <div class="student-card glass-card" id="student-card" style="display:none;">
+                    <div class="card-header">
+                        <div class="student-avatar" id="student-avatar">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="40"
+                                height="40">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                                <circle cx="12" cy="7" r="4" />
+                            </svg>
+                        </div>
+                        <div class="student-name-group">
+                            <h2 id="student-name">—</h2>
+                            <span class="badge badge-dept" id="student-dept-badge">—</span>
+                        </div>
+                    </div>
+
+                    <div class="card-details">
+                        <div class="detail-row">
+                            <div class="detail-item">
+                                <span class="detail-label">Register Number</span>
+                                <span class="detail-value" id="student-reg">—</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Class</span>
+                                <span class="detail-value" id="student-class">—</span>
+                            </div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-item">
+                                <span class="detail-label">Date</span>
+                                <span class="detail-value" id="student-date">—</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">In Time</span>
+                                <span class="detail-value highlight" id="student-time">—</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary btn-lg btn-submit" id="btn-submit-attendance" type="button">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20"
+                            height="20">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                            <polyline points="22 4 12 14.01 9 11.01" />
+                        </svg>
+                        Submit Attendance
+                    </button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- ─── Toast Container ─── -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- ─── Scripts ─── -->
+    <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2/dist/quagga.min.js"></script>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <script src="{{ url_for('static', filename='js/scanner.js', v='20260311-1') }}"></script>
+</body>
+
+</html>

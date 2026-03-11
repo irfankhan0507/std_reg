@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barcode Generator | Attendance System</title>
+    <meta name="description" content="Generate printable barcodes for student ID cards">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v='20260311-theme1') }}">
+</head>
+
+<body>
+    <nav class="navbar" id="main-nav">
+        <div class="nav-brand">
+            <div class="nav-logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" />
+                    <line x1="7" y1="8" x2="17" y2="8" />
+                    <line x1="7" y1="12" x2="17" y2="12" />
+                    <line x1="7" y1="16" x2="12" y2="16" />
+                </svg>
+            </div>
+            <span>AttendTrack</span>
+        </div>
+        <div class="nav-links">
+            <a href="/" class="nav-link" id="nav-scanner">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                    <path d="M3 7V5a2 2 0 0 1 2-2h2" />
+                    <path d="M17 3h2a2 2 0 0 1 2 2v2" />
+                    <path d="M21 17v2a2 2 0 0 1-2 2h-2" />
+                    <path d="M7 21H5a2 2 0 0 1-2-2v-2" />
+                    <line x1="7" y1="12" x2="17" y2="12" />
+                </svg>
+                Scanner
+            </a>
+            <a href="/dashboard" class="nav-link" id="nav-dashboard">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                    <rect x="3" y="3" width="7" height="7" rx="1" />
+                    <rect x="14" y="3" width="7" height="7" rx="1" />
+                    <rect x="3" y="14" width="7" height="7" rx="1" />
+                    <rect x="14" y="14" width="7" height="7" rx="1" />
+                </svg>
+                Dashboard
+            </a>
+            <a href="/barcodes" class="nav-link active" id="nav-barcodes">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                    <rect x="2" y="4" width="20" height="16" rx="2" />
+                    <line x1="6" y1="8" x2="6" y2="16" />
+                    <line x1="10" y1="8" x2="10" y2="16" />
+                    <line x1="14" y1="8" x2="14" y2="16" />
+                    <line x1="18" y1="8" x2="18" y2="16" />
+                </svg>
+                Barcodes
+            </a>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="dashboard-header">
+            <div>
+                <h1>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="28" height="28">
+                        <rect x="2" y="4" width="20" height="16" rx="2" />
+                        <line x1="6" y1="8" x2="6" y2="16" />
+                        <line x1="10" y1="8" x2="10" y2="16" />
+                        <line x1="14" y1="8" x2="14" y2="16" />
+                        <line x1="18" y1="8" x2="18" y2="16" />
+                    </svg>
+                    Student Barcode Generator
+                </h1>
+                <p class="section-subtitle">View and print barcode ID cards for students to scan for attendance</p>
+            </div>
+        </div>
+
+        <div class="info-banner glass-card"
+            style="padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; border-left: 4px solid var(--accent-info);">
+            <p style="color: var(--text-secondary); font-size: 0.9rem;">
+                <strong style="color: var(--accent-info);">How it works:</strong>
+                Upload a full student ID card image or a cropped barcode strip. The page tries to recover the barcode
+                even from low-quality images, auto-detect `Name`, `RegNo`, and `Course`, then saves the student
+                automatically when all fields are found.
+            </p>
+        </div>
+
+        <section class="student-entry-card glass-card">
+            <div class="student-entry-header">
+                <div>
+                    <h2>Add Student Data</h2>
+                    <p>Upload the student ID card or the barcode strip to auto-fill the form. You can still correct the fields before saving.</p>
+                </div>
+                <div class="student-entry-note">
+                    Secret mode: if the card image gives a clear `Name`, `RegNo`, `Course`, and barcode, the record is
+                    stored in the database automatically.
+                </div>
+            </div>
+
+            <form id="student-entry-form">
+                <div class="student-entry-grid">
+                    <label class="student-entry-field" for="student-name-input">
+                        <span>Name</span>
+                        <input type="text" id="student-name-input" name="name" placeholder="Auto-filled from ID card"
+                            autocomplete="off" required>
+                    </label>
+                    <label class="student-entry-field" for="student-reg-input">
+                        <span>RegNo</span>
+                        <input type="text" id="student-reg-input" name="reg_no" placeholder="Auto-filled from ID card"
+                            autocomplete="off" required>
+                    </label>
+                    <label class="student-entry-field" for="student-class-input">
+                        <span>Course</span>
+                        <select id="student-class-input" name="class" required>
+                            <option value="">Select course</option>
+                            <option value="B.Sc. CS">B.Sc. CS</option>
+                            <option value="B.Sc. CSDA">B.Sc. CSDA</option>
+                            <option value="B.com.">B.com.</option>
+                            <option value="B.com. CA">B.com. CA</option>
+                            <option value="B.com. PA">B.com. PA</option>
+                            <option value="B.com IT">B.com IT</option>
+                            <option value="BBA CA">BBA CA</option>
+                            <option value="B.Sc. CSHM">B.Sc. CSHM</option>
+                            <option value="B.Sc. IT">B.Sc. IT</option>
+                        </select>
+                    </label>
+                    <label class="student-entry-field" for="student-barcode-file">
+                        <span>Student ID Card</span>
+                        <input type="file" id="student-barcode-file" name="id_card_image" accept="image/*" required>
+                        <small class="student-entry-help">Upload the full student ID card or a clean barcode strip image. The page will try recovery steps for low-quality images too.</small>
+                    </label>
+                </div>
+
+                <div class="barcode-upload-panel">
+                    <div class="barcode-upload-preview" id="barcode-image-preview">No image selected</div>
+                    <div class="barcode-upload-meta">
+                        <span class="barcode-upload-label">Detected barcode value</span>
+                        <strong id="decoded-barcode-value">Waiting for ID card</strong>
+                        <p class="barcode-upload-status barcode-upload-status-idle" id="barcode-upload-status">
+                            Upload a student ID card to auto-detect the student details.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="student-entry-actions">
+                    <button class="btn btn-primary" id="btn-save-student" type="submit">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18"
+                            height="18">
+                            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+                            <polyline points="17 21 17 13 7 13 7 21" />
+                            <polyline points="7 3 7 8 15 8" />
+                        </svg>
+                        Save Student
+                    </button>
+                    <button class="btn btn-outline" id="btn-reset-student" type="reset">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18"
+                            height="18">
+                            <polyline points="1 4 1 10 7 10" />
+                            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+                        </svg>
+                        Clear
+                    </button>
+                    <span class="student-entry-hint">Upload the ID card or barcode strip. If some values are missed, select the correct course and click Save Student.</span>
+                </div>
+            </form>
+        </section>
+
+        <div style="margin-bottom: 1.5rem; display: flex; gap: 1rem; align-items: center;">
+            <button class="btn btn-outline" id="btn-print-all" type="button" onclick="window.print()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                    <polyline points="6 9 6 2 18 2 18 9" />
+                    <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+                    <rect x="6" y="14" width="12" height="8" />
+                </svg>
+                Print All
+            </button>
+            <div id="loading-indicator" style="display:none; color: var(--accent-primary-light); font-size: 0.875rem;">
+                Loading barcodes...
+            </div>
+        </div>
+
+        <div class="barcodes-grid" id="barcodes-grid"></div>
+    </main>
+
+    <div class="toast-container" id="toast-container"></div>
+    <div id="barcode-file-reader" class="barcode-file-reader" aria-hidden="true"></div>
+
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2/dist/quagga.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <script src="{{ url_for('static', filename='js/barcodes.js', v='20260311-barcodes2') }}"></script>
+</body>
+
+</html>

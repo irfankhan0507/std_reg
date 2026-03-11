@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance Dashboard | Attendance System</title>
+    <meta name="description" content="View, filter, and export student attendance records">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v='20260311-theme1') }}">
+</head>
+
+<body>
+    <!-- ─── Navigation ─── -->
+    <nav class="navbar" id="main-nav">
+        <div class="nav-brand">
+            <div class="nav-logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" />
+                    <line x1="7" y1="8" x2="17" y2="8" />
+                    <line x1="7" y1="12" x2="17" y2="12" />
+                    <line x1="7" y1="16" x2="12" y2="16" />
+                </svg>
+            </div>
+            <span>AttendTrack</span>
+        </div>
+        <div class="nav-links">
+            <a href="/" class="nav-link" id="nav-scanner">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                    <path d="M3 7V5a2 2 0 0 1 2-2h2" />
+                    <path d="M17 3h2a2 2 0 0 1 2 2v2" />
+                    <path d="M21 17v2a2 2 0 0 1-2 2h-2" />
+                    <path d="M7 21H5a2 2 0 0 1-2-2v-2" />
+                    <line x1="7" y1="12" x2="17" y2="12" />
+                </svg>
+                Scanner
+            </a>
+            <a href="/dashboard" class="nav-link active" id="nav-dashboard">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                    <rect x="3" y="3" width="7" height="7" rx="1" />
+                    <rect x="14" y="3" width="7" height="7" rx="1" />
+                    <rect x="3" y="14" width="7" height="7" rx="1" />
+                    <rect x="14" y="14" width="7" height="7" rx="1" />
+                </svg>
+                Dashboard
+            </a>
+            <a href="/barcodes" class="nav-link" id="nav-barcodes">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18">
+                    <rect x="2" y="4" width="20" height="16" rx="2" />
+                    <line x1="6" y1="8" x2="6" y2="16" />
+                    <line x1="10" y1="8" x2="10" y2="16" />
+                    <line x1="14" y1="8" x2="14" y2="16" />
+                    <line x1="18" y1="8" x2="18" y2="16" />
+                </svg>
+                Barcodes
+            </a>
+        </div>
+    </nav>
+
+    <!-- ─── Main Content ─── -->
+    <main class="main-content">
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <div>
+                <h1>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="28" height="28">
+                        <rect x="3" y="3" width="7" height="7" rx="1" />
+                        <rect x="14" y="3" width="7" height="7" rx="1" />
+                        <rect x="3" y="14" width="7" height="7" rx="1" />
+                        <rect x="14" y="14" width="7" height="7" rx="1" />
+                    </svg>
+                    Attendance Dashboard
+                </h1>
+                <p class="section-subtitle">View, filter, and export attendance records</p>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="dashboard-stats" id="dashboard-stats">
+            <div class="stat-card glass-card">
+                <div class="stat-card-icon stat-icon-primary">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                    </svg>
+                </div>
+                <div class="stat-card-info">
+                    <span class="stat-card-label">Present Today</span>
+                    <span class="stat-card-value" id="dash-stat-today">0</span>
+                </div>
+            </div>
+            <div class="stat-card glass-card">
+                <div class="stat-card-icon stat-icon-success">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
+                        <path d="M12 20h9" />
+                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+                    </svg>
+                </div>
+                <div class="stat-card-info">
+                    <span class="stat-card-label">Total Enrolled</span>
+                    <span class="stat-card-value" id="dash-stat-total">0</span>
+                </div>
+            </div>
+            <div class="stat-card glass-card">
+                <div class="stat-card-icon stat-icon-warning">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
+                        <circle cx="12" cy="12" r="10" />
+                        <polyline points="12 6 12 12 16 14" />
+                    </svg>
+                </div>
+                <div class="stat-card-info">
+                    <span class="stat-card-label">Attendance Rate</span>
+                    <span class="stat-card-value" id="dash-stat-rate">0%</span>
+                </div>
+            </div>
+            <div class="stat-card glass-card">
+                <div class="stat-card-icon stat-icon-info">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                        <line x1="16" y1="2" x2="16" y2="6" />
+                        <line x1="8" y1="2" x2="8" y2="6" />
+                        <line x1="3" y1="10" x2="21" y2="10" />
+                    </svg>
+                </div>
+                <div class="stat-card-info">
+                    <span class="stat-card-label">Departments</span>
+                    <span class="stat-card-value" id="dash-stat-depts">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters-section glass-card" id="filters-section">
+            <div class="filters-header">
+                <h2>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                        <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+                    </svg>
+                    Filters
+                </h2>
+            </div>
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label for="filter-reg">Register Number</label>
+                    <div class="input-wrapper">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16"
+                            height="16" class="input-icon">
+                            <circle cx="11" cy="11" r="8" />
+                            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                        </svg>
+                        <input type="text" id="filter-reg" placeholder="Search by Reg No...">
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <label for="filter-dept">Department</label>
+                    <select id="filter-dept">
+                        <option value="">All Departments</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filter-date">Date</label>
+                    <input type="date" id="filter-date">
+                </div>
+                <div class="filter-group filter-actions">
+                    <label>&nbsp;</label>
+                    <div class="filter-buttons">
+                        <button class="btn btn-primary" id="btn-apply-filters" type="button">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16"
+                                height="16">
+                                <polyline points="22 4 12 14.01 9 11.01" />
+                            </svg>
+                            Apply
+                        </button>
+                        <button class="btn btn-outline" id="btn-clear-filters" type="button">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16"
+                                height="16">
+                                <line x1="18" y1="6" x2="6" y2="18" />
+                                <line x1="6" y1="6" x2="18" y2="18" />
+                            </svg>
+                            Clear
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Records Table -->
+        <div class="records-section glass-card" id="records-section">
+            <div class="records-header">
+                <h2>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+                        <line x1="8" y1="6" x2="21" y2="6" />
+                        <line x1="8" y1="12" x2="21" y2="12" />
+                        <line x1="8" y1="18" x2="21" y2="18" />
+                        <line x1="3" y1="6" x2="3.01" y2="6" />
+                        <line x1="3" y1="12" x2="3.01" y2="12" />
+                        <line x1="3" y1="18" x2="3.01" y2="18" />
+                    </svg>
+                    Attendance Records
+                </h2>
+                <button class="btn btn-success" id="btn-export" type="button">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <polyline points="7 10 12 15 17 10" />
+                        <line x1="12" y1="15" x2="12" y2="3" />
+                    </svg>
+                    Export Excel
+                </button>
+            </div>
+
+            <div class="table-container">
+                <table class="records-table" id="records-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Register No</th>
+                            <th>Name</th>
+                            <th>Department</th>
+                            <th>Class</th>
+                        </tr>
+                    </thead>
+                    <tbody id="records-tbody">
+                        <!-- Records injected by JS -->
+                    </tbody>
+                </table>
+
+                <!-- Empty Table State -->
+                <div class="table-empty" id="table-empty" style="display:none;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="48"
+                        height="48">
+                        <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" />
+                        <polyline points="13 2 13 9 20 9" />
+                    </svg>
+                    <p>No attendance records found</p>
+                    <span>Try adjusting your filters or check back later</span>
+                </div>
+            </div>
+
+            <!-- Pagination info -->
+            <div class="table-footer">
+                <span class="record-count" id="record-count">Showing 0 records</span>
+            </div>
+        </div>
+    </main>
+
+    <!-- ─── Toast Container ─── -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+
+</html>
